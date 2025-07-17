@@ -2,18 +2,18 @@ import os
 
 import openai
 import requests
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+load_dotenv()  # Загружаем переменные из .env
 app = FastAPI()
 
 # Получаем API ключи из переменных окружения
-openai.api_key = os.getenv(
-    "OPENAI_API_KEY"
-)  # Устанавливаем ключ OpenAI из переменной окружения
+openai.api_key = os.getenv("OPENAI_API_KEY")  # Устанавливаем ключ OpenAI из .env
 currentsapi_key = os.getenv(
     "CURRENTS_API_KEY"
-)  # Устанавливаем ключ Currents API из переменной окружения
+)  # Устанавливаем ключ Currents API из .env
 
 # Проверяем, что оба API ключа заданы, иначе выбрасываем ошибку
 if not openai.api_key or not currentsapi_key:
@@ -65,7 +65,7 @@ def generate_content(topic: str):
                         "content": f"Придумайте привлекательный и точный заголовок для статьи на тему '{topic}', с учётом актуальных новостей:\n{recent_news}. Заголовок должен быть интересным и ясно передавать суть темы.",
                     }
                 ],
-                max_tokens=60,  # Ограничиваем длину ответа
+                max_tokens=20,  # Ограничиваем длину ответа
                 temperature=0.5,  # Умеренная случайность
                 stop=["\n"],  # Прерывание на новой строке
             )
@@ -83,7 +83,7 @@ def generate_content(topic: str):
                         "content": f"Напишите мета-описание для статьи с заголовком: '{title}'. Оно должно быть полным, информативным и содержать основные ключевые слова.",
                     }
                 ],
-                max_tokens=120,  # Увеличиваем лимит токенов для полного ответа
+                max_tokens=60,  # Увеличиваем лимит токенов для полного ответа
                 temperature=0.5,
                 stop=["."],
             )
@@ -101,7 +101,7 @@ def generate_content(topic: str):
                         "content": f"""Напишите подробную статью на тему '{topic}', используя последние новости:\n{recent_news}. 
                 Статья должна быть:
                 1. Информативной и логичной
-                2. Содержать не менее 1500 символов
+                2. Содержать не менее 500 символов
                 3. Иметь четкую структуру с подзаголовками
                 4. Включать анализ текущих трендов
                 5. Иметь вступление, основную часть и заключение
@@ -110,7 +110,7 @@ def generate_content(topic: str):
                 8. Текст должен быть легким для восприятия и содержательным""",
                     }
                 ],
-                max_tokens=1500,  # Лимит токенов для развернутого текста
+                max_tokens=500,  # Лимит токенов для развернутого текста
                 temperature=0.5,
                 presence_penalty=0.6,  # Штраф за повторение фраз
                 frequency_penalty=0.6,
